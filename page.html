@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат-бот HelpDesk</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .chat-container {
+            width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            padding-bottom: 10px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .user-message {
+            background: #007bff;
+            color: white;
+            text-align: right;
+        }
+        .bot-message {
+            background: #f4f4f4;
+            color: #333;
+        }
+        .input-container {
+            display: flex;
+            margin-top: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        button {
+            padding: 10px;
+            background: #ff9500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-left: 5px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <div class="chat-box" id="chatBox"></div>
+    <div class="input-container">
+        <input type="text" id="userInput" placeholder="Введите описание для поиска услуги">
+        <button onclick="sendMessage()">Отправить</button>
+    </div>
+</div>
+
+<script>
+    function sendMessage() {
+        let inputField = document.getElementById("userInput");
+        let message = inputField.value.trim();
+        if (message === "") return;
+
+        addMessage("Вы: " + message, "user-message");
+
+        let formData = new URLSearchParams();
+        formData.append("answer", message);
+
+        fetch("http://localhost:8080/main", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData
+        })
+            .then(response => response.text())
+            .then(data => {
+                addMessage("Бот: " + data, "bot-message");
+            })
+            .catch(error => {
+                addMessage("Бот: Ошибка соединения с сервером.", "bot-message");
+                console.error("Ошибка:", error);
+            });
+
+        inputField.value = "";
+    }
+
+    function addMessage(text, className) {
+        let chatBox = document.getElementById("chatBox");
+        let messageElement = document.createElement("div");
+        messageElement.className = "message " + className;
+        messageElement.innerHTML = text.replace(/\n/g, "<br>");
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+</body>
+</html>
