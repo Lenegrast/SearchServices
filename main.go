@@ -21,7 +21,7 @@ func main() {
 
 	// Запуск сервера
 	logrus.Infof("Server started. Port %s", "")
-	err := http.ListenAndServe("localhost:8080", nil)
+	err := http.ListenAndServe("https://lenegrast.github.io/SearchServices/", nil)
 	if err != nil {
 		logrus.Fatalf("Failed with start server. Error: %s", err)
 	}
